@@ -1,11 +1,12 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
-import { ApiHandlerOptions, ModelInfo, requestyDefaultModelId, requestyDefaultModelInfo } from "@shared/api"
+import { ModelInfo, requestyDefaultModelId, requestyDefaultModelInfo } from "@shared/api"
 import { ApiHandler } from "../index"
 import { withRetry } from "../retry"
 import { convertToOpenAiMessages } from "@api/transform/openai-format"
 import { calculateApiCostOpenAI } from "@utils/cost"
 import { ApiStream } from "@api/transform/stream"
+import { toRequestyServiceUrl } from "@/shared/providers/requesty"
 
 interface RequestyHandlerOptions {
 	requestyBaseUrl?: string
@@ -41,7 +42,7 @@ export class RequestyHandler implements ApiHandler {
 			}
 			try {
 				this.client = new OpenAI({
-					baseURL: this.options.requestyBaseUrl || "https://router.requesty.ai/v1",
+					baseURL: toRequestyServiceUrl(this.options.requestyBaseUrl),
 					apiKey: this.options.requestyApiKey,
 					defaultHeaders: {
 						"HTTP-Referer": "https://cline.bot",

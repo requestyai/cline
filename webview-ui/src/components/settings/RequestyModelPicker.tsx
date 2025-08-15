@@ -15,13 +15,15 @@ import { getModeSpecificFields, normalizeApiConfiguration } from "./utils/provid
 import ThinkingBudgetSlider from "./ThinkingBudgetSlider"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
 import { Mode } from "@shared/storage/types"
+import { toRequestyServiceUrl } from "@shared/providers/requesty"
 
 export interface RequestyModelPickerProps {
 	isPopup?: boolean
+	baseUrl?: string
 	currentMode: Mode
 }
 
-const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, currentMode }) => {
+const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, baseUrl, currentMode }) => {
 	const { apiConfiguration, requestyModels, setRequestyModels } = useExtensionState()
 	const { handleModeFieldsChange } = useApiConfigurationHandlers()
 	const modeFields = getModeSpecificFields(apiConfiguration, currentMode)
@@ -31,6 +33,9 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, curr
 	const dropdownRef = useRef<HTMLDivElement>(null)
 	const itemRefs = useRef<(HTMLDivElement | null)[]>([])
 	const dropdownListRef = useRef<HTMLDivElement>(null)
+
+	const resolvedUrl = toRequestyServiceUrl(baseUrl)
+	const requestyModelListUrl = new URL("models", resolvedUrl)
 
 	const handleModelChange = (newModelId: string) => {
 		// could be setting invalid model id/undefined info but validation will catch it
@@ -248,7 +253,7 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, curr
 					}}>
 					<>
 						The extension automatically fetches the latest list of models available on{" "}
-						<VSCodeLink style={{ display: "inline", fontSize: "inherit" }} href="https://app.requesty.ai/router/list">
+						<VSCodeLink style={{ display: "inline", fontSize: "inherit" }} href={requestyModelListUrl}>
 							Requesty.
 						</VSCodeLink>
 						If you're unsure which model to choose, Cline works best with{" "}

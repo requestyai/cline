@@ -6,6 +6,7 @@ import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useState } from "react"
 import { VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react"
 import { DebouncedTextField } from "../common/DebouncedTextField"
+import { toRequestyServiceUrl } from "@shared/providers/requesty"
 
 /**
  * Props for the RequestyProvider component
@@ -25,13 +26,16 @@ export const RequestyProvider = ({ showModelOptions, isPopup, currentMode }: Req
 
 	const [requestyEndpointSelected, setRequestyEndpointSelected] = useState(!!apiConfiguration?.requestyBaseUrl)
 
+	const resolvedUrl = toRequestyServiceUrl(apiConfiguration?.requestyBaseUrl, "app")
+	const apiKeyUrl = new URL("api-keys", resolvedUrl).toString()
+
 	return (
 		<div>
 			<ApiKeyField
 				initialValue={apiConfiguration?.requestyApiKey || ""}
 				onChange={(value) => handleFieldChange("requestyApiKey", value)}
 				providerName="Requesty"
-				signupUrl="https://app.requesty.ai/api-keys"
+				signupUrl={apiKeyUrl}
 			/>
 			<VSCodeCheckbox
 				checked={requestyEndpointSelected}
@@ -56,7 +60,9 @@ export const RequestyProvider = ({ showModelOptions, isPopup, currentMode }: Req
 					placeholder="Custom base URL"
 				/>
 			)}
-			{showModelOptions && <RequestyModelPicker isPopup={isPopup} currentMode={currentMode} />}
+			{showModelOptions && (
+				<RequestyModelPicker baseUrl={apiConfiguration?.requestyBaseUrl} isPopup={isPopup} currentMode={currentMode} />
+			)}
 		</div>
 	)
 }
